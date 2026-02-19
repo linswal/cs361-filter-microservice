@@ -1,0 +1,19 @@
+{
+  "name": "filter-microservice",
+  "version": "1.0.0",
+  "description": "This microservice filters a list of items (objects) from JSON files.\r The main program requests items to be filtered by \"category\" and/or \"date\".\r This microservice returns only the items with the matching value(s) for the corresponding filters.",
+  "main": "test_program.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linswal/cs361-filter-microservice.git"
+  },
+  "author": "linswal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/linswal/cs361-filter-microservice/issues"
+  },
+  "homepage": "https://github.com/linswal/cs361-filter-microservice#readme"
+}
