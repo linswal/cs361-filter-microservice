@@ -10,7 +10,7 @@ The user will request data for the microservice through a main program's user
 interface. The main program will call a function that will open and write the 
 request object in input/request.json. An example request is shown below:
 
-Example call in main program: `requestFilterItems(items)`
+Example call in main program: `requestFilterItems(items, filters)`
 Example items array (in Javascript):
 ```
 const items = [
@@ -27,9 +27,8 @@ const items = [
 ]
 ```
 
-Note: items will need to bed converted into JSON format within `requestFilterItems`
-
-The call `requestFilterItems(items)` will write the following request object in input/request.json:
+The call `requestFilterItems(items, filters)` will write the following 
+request object (in JSON format) in input/request.json:
 ```
 {
     "filters": {                        // Object (required) - must contain at least one of the properties
@@ -40,7 +39,7 @@ The call `requestFilterItems(items)` will write the following request object in 
 }
 ```
 
-## how to programmatically receive data
+## How to programmatically receive data
 
 Once the microservice is running, it constantly scans the request.json file for any changes.
 If the main program writes a request in request.json and it passes the validation from the microservice,
@@ -66,3 +65,4 @@ Otherwise if the request is invalid, the following response object will be writt
 Once the response object is written in response.json, the main program processes the response. 
 
 ## UML Sequence Diagram
+
