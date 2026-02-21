@@ -65,4 +65,4 @@ Otherwise if the request is invalid, the following response object will be writt
 Once the response object is written in response.json, the main program processes the response. 
 
 ## UML Sequence Diagram
-
+![Image of UML Sequence Diagram](./uml.png)
