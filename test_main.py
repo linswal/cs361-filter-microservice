@@ -37,7 +37,8 @@ def mock_filter_items(items, filters):
     """
     return [
         item for item in items
-        if ("category" not in filters or item["category"] == filters["category"])
+        if ("category" not in filters or
+            item["category"] == filters["category"])
         and ("date" not in filters or item["date"] == filters["date"])
     ]
 
@@ -64,9 +65,8 @@ def process_one_request():
     filters = parsed_request.get("filters", {})
 
     validation_result = microservice.validate_request(parsed_request)
-    is_valid = validation_result if isinstance(validation_result, bool) else bool(validation_result)
 
-    if is_valid:
+    if validation_result:
         filtered_items = microservice.filter_items(items, filters)
         response = {
             "status": "success",
@@ -127,8 +127,8 @@ with patch('microservice.validate_request', return_value=True):
         if response['status'] == 'success':
             print(f"Filtered items: {len(response['new_items'])} items")
             for item in response['new_items']:
-                print(f"  - {item['name']} ({item['category']})")
-        print(f"Expected: 2 items (Jogging, Meditation)")
+                print(f"- {item['name']} ({item['category']})")
+        print("Expected: 2 items (Jogging, Meditation)")
         print()
 
         # Test 2: Filter by date
@@ -140,21 +140,22 @@ with patch('microservice.validate_request', return_value=True):
         if response['status'] == 'success':
             print(f"Filtered items: {len(response['new_items'])} items")
             for item in response['new_items']:
-                print(f"  - {item['name']} ({item['date']})")
-        print(f"Expected: 1 item (Studying)")
+                print(f"- {item['name']} ({item['date']})")
+        print("Expected: 1 item (Studying)")
         print()
 
         # Test 3: Filter by category AND date
         print("Test 3: Filter by category 'Health' AND date '2026-02-20'")
-        write_test_request({"category": "Health", "date": "2026-02-20"}, test_items)
+        write_test_request({"category": "Health", "date": "2026-02-20"},
+                           test_items)
         process_one_request()
         response = read_response()
         print(f"Response status: {response['status']}")
         if response['status'] == 'success':
             print(f"Filtered items: {len(response['new_items'])} items")
             for item in response['new_items']:
-                print(f"  - {item['name']} ({item['category']}, {item['date']})")
-        print(f"Expected: 1 item (Jogging)")
+                print(f"- {item['name']} ({item['category']}, {item['date']})")
+        print("Expected: 1 item (Jogging)")
         print()
 
         # Test 4: No matching items
@@ -165,7 +166,7 @@ with patch('microservice.validate_request', return_value=True):
         print(f"Response status: {response['status']}")
         if response['status'] == 'success':
             print(f"Filtered items: {len(response['new_items'])} items")
-        print(f"Expected: 0 items")
+        print("Expected: 0 items")
         print()
 
 # Test 5: Invalid request (validate returns False)
@@ -178,7 +179,7 @@ with patch('microservice.validate_request', return_value=False):
         print(f"Response status: {response['status']}")
         if response['status'] == 'failure':
             print(f"Original items returned: {len(response['items'])} items")
-        print(f"Expected: status 'failure', 3 original items")
+        print("Expected: status 'failure', 3 original items")
         print()
 
 print("=" * 50)

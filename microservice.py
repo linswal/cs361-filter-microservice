@@ -38,8 +38,11 @@ def validate_request(request_object):
         return False
 
     # check if filter exists and is a dictionary
-    filters = data.get("filters", {})
-    if not isinstance(filters, dict):
+    filters = data.get("filters")
+    if not filters:
+        print("'filters' is missing")
+        return False
+    elif not isinstance(filters, dict):
         print("'filters' must be a dictionary")
         return False
 
@@ -49,16 +52,15 @@ def validate_request(request_object):
     for key in filters:
         if key not in filter_options:
             print(f"Filter not known: '{key}'")
+            return False
 
     # check filters are strings
     if "category" in filters and not isinstance(filters["category"], str):
         print("'category' must be a string")
+        return False
 
     if "date" in filters and not isinstance(filters["date"], str):
         print("'date' must be a string")
-
-    # check for errors
-    if errors:
         return False
 
     return True
@@ -85,8 +87,8 @@ if __name__ == "__main__":
             # Get items and filters from request
             parsed_request = json.loads(request_object)
             items = parsed_request.get("items", [])
-            filters = parsed_request.get("filters", {})          
-          
+            filters = parsed_request.get("filters", {})
+
             # Valid: filter items and write success response
             filtered_items = filter_items(items, filters)
             response = {
