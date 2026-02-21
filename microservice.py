@@ -17,12 +17,50 @@ def filter_items(items, filters):
         item for item in items
         if ("category" not in filters or
             items["category"] == filters["category"])
-        and ("date" not in filters or items["date" == filters["date"]])
+        and ("date" not in filters or item["date"] == filters["date"])
     ]
 
 
-# Return True if request is valid, False otherwise
 def validate_request(request_object):
+    """
+    Validates JSON request file:
+    - reads JSON
+    - checks if filters are valid
+
+    returns True for filtering
+    returns False for error
+    """
+    # load JSON
+    try:
+        data = json.loads(request_object)
+    except json.JSONDecodeError:
+        print("JSON request is not valid")
+        return False
+
+    # check if filter exists and is a dictionary
+    filters = data.get("filters", {})
+    if not isinstance(filters, dict):
+        print("'filters' must be a dictionary")
+        return False
+
+    # filter options
+    filter_options = ["category", "date"]
+
+    for key in filters:
+        if key not in filter_options:
+            print(f"Filter not known: '{key}'")
+
+    # check filters are strings
+    if "category" in filters and not isinstance(filters["category"], str):
+        print("'category' must be a string")
+
+    if "date" in filters and not isinstance(filters["date"], str):
+        print("'date' must be a string")
+
+    # check for errors
+    if errors:
+        return False
+
     return True
 
 
@@ -40,21 +78,15 @@ if __name__ == "__main__":
             time.sleep(0.1)
             continue
 
-        # Parse JSON
-        try:
-            parsed_request = json.loads(request_object)
-        except json.JSONDecodeError:
-            time.sleep(0.1)
-            continue
-
-        # Get items and filters from request
-        items = parsed_request.get("items", [])
-        filters = parsed_request.get("filters", {})
-
         # Validate request
-        validation_result = validate_request(parsed_request)
+        validation_result = validate_request(request_object)
 
         if validation_result:
+            # Get items and filters from request
+            parsed_request = json.loads(request_object)
+            items = parsed_request.get("items", [])
+            filters = parsed_request.get("filters", {})          
+          
             # Valid: filter items and write success response
             filtered_items = filter_items(items, filters)
             response = {
