@@ -1,0 +1,28 @@
+{
+    "filters": {
+        "category": "Health"
+    },
+    "items": [
+        {
+            "name": "Studying",
+            "category": "Productivity",
+            "date": "2026-01-10",
+            "time": "14:30",
+            "id": 1234
+        },
+        {
+            "name": "Jogging",
+            "category": "Health",
+            "date": "2026-02-20",
+            "time": "9:10",
+            "id": 5678
+        },
+        {
+            "name": "Meditation",
+            "category": "Health",
+            "date": "2026-01-15",
+            "time": "7:00",
+            "id": 9012
+        }
+    ]
+}
