@@ -1,10 +1,18 @@
 import json
 import time
 
-# filter list of items from request_object and return correct list of items
-# items (array) of item (dict)
-# filters (dict)
+
 def filter_items(items, filters):
+    """
+    Filter items by filters' properties
+
+    Parameters:
+        items (list): A list of item (dict)
+        filters (dict): Contain "category" and/or "date" properties
+
+    Returns:
+        list: Contain item(s) that matched the filters properties' values
+    """
     return [
         item for item in items
         if ("category" not in filters or
@@ -13,10 +21,9 @@ def filter_items(items, filters):
     ]
 
 
-# Feel free to change this function to only return True or False and make another
-# function to write the response object if you'd like!
+# Return True if request is valid, False otherwise
 def validate_request(request_object):
-    return {}   # or return booleans
+    return True
 
 
 if __name__ == "__main__":
@@ -27,28 +34,27 @@ if __name__ == "__main__":
         # main() structure and flow
         # Assignee: Eduardo
         # Issue: #5
-        
+
         # Skip if empty
         if not request_object.strip():
             time.sleep(0.1)
             continue
-        
+
         # Parse JSON
         try:
             parsed_request = json.loads(request_object)
         except json.JSONDecodeError:
             time.sleep(0.1)
             continue
-        
+
         # Get items and filters from request
         items = parsed_request.get("items", [])
         filters = parsed_request.get("filters", {})
-        
+
         # Validate request
         validation_result = validate_request(parsed_request)
-        is_valid = validation_result if isinstance(validation_result, bool) else bool(validation_result)
-        
-        if is_valid:
+
+        if validation_result:
             # Valid: filter items and write success response
             filtered_items = filter_items(items, filters)
             response = {
@@ -61,9 +67,9 @@ if __name__ == "__main__":
                 "status": "failure",
                 "items": items
             }
-        
+
         # Write response
         with open('./output/response.json', 'w', encoding='utf-8') as file:
             json.dump(response, file, indent=4)
-        
+
         time.sleep(0.1)

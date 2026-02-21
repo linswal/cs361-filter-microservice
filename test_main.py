@@ -48,24 +48,24 @@ def process_one_request():
     This mimics what happens inside the while loop.
     """
     import microservice
-    
+
     with open(INPUT, 'r', encoding='utf-8') as request:
         request_object = request.read()
-    
+
     if not request_object.strip():
         return
-    
+
     try:
         parsed_request = json.loads(request_object)
     except json.JSONDecodeError:
         return
-    
+
     items = parsed_request.get("items", [])
     filters = parsed_request.get("filters", {})
-    
+
     validation_result = microservice.validate_request(parsed_request)
     is_valid = validation_result if isinstance(validation_result, bool) else bool(validation_result)
-    
+
     if is_valid:
         filtered_items = microservice.filter_items(items, filters)
         response = {
@@ -77,7 +77,7 @@ def process_one_request():
             "status": "failure",
             "items": items
         }
-    
+
     with open(OUTPUT, 'w', encoding='utf-8') as file:
         json.dump(response, file, indent=4)
 
@@ -117,7 +117,7 @@ print()
 # Patch both validate_request and filter_items
 with patch('microservice.validate_request', return_value=True):
     with patch('microservice.filter_items', side_effect=mock_filter_items):
-    
+
         # Test 1: Filter by category
         print("Test 1: Filter by category 'Health'")
         write_test_request({"category": "Health"}, test_items)
