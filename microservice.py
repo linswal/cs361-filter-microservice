@@ -1,20 +1,26 @@
 import json
+import time
 
 
-# filter list of items from request_object and return correct list of items
-# items (array) of item (dict)
-# filters (dict)
 def filter_items(items, filters):
+    """
+    Filter items by filters' properties
+
+    Parameters:
+        items (list): A list of item (dict)
+        filters (dict): Contain "category" and/or "date" properties
+
+    Returns:
+        list: Contain item(s) that matched the filters properties' values
+    """
     return [
         item for item in items
         if ("category" not in filters or
-            items.get["category"] == filters["category"])
-        and ("date" not in filters or item.get("date") == filters["date"])
+            items["category"] == filters["category"])
+        and ("date" not in filters or item["date"] == filters["date"])
     ]
 
 
-# Feel free to change this function to only return True or False and make another
-# function to write the response object if you'd like!
 def validate_request(request_object):
     """
     Validates JSON request file:
@@ -24,41 +30,38 @@ def validate_request(request_object):
     returns True for filtering
     returns False for error
     """
-    errors = []
-
     # load JSON
     try:
         data = json.loads(request_object)
     except json.JSONDecodeError:
-        return False, ["JSON request is not valid"]
+        print("JSON request is not valid")
+        return False
 
     # check if filter exists and is a dictionary
     filters = data.get("filters", {})
     if not isinstance(filters, dict):
-        return False, ["'filters' must be a dictionary"]
+        print("'filters' must be a dictionary")
+        return False
 
     # filter options
     filter_options = ["category", "date"]
 
     for key in filters:
         if key not in filter_options:
-            errors.append(f"Filter not known: '{key}'")
+            print(f"Filter not known: '{key}'")
 
     # check filters are strings
     if "category" in filters and not isinstance(filters["category"], str):
-        errors.append("'category' must be a string")
+        print("'category' must be a string")
 
     if "date" in filters and not isinstance(filters["date"], str):
-        errors.append("'date' must be a string")
+        print("'date' must be a string")
 
     # check for errors
     if errors:
-        return False, errors
+        return False
 
-    return True, filters
-
-
-    # return {}   # or return booleans
+    return True
 
 
 if __name__ == "__main__":
@@ -66,4 +69,39 @@ if __name__ == "__main__":
         with open('./input/request.json', 'r', encoding='utf-8') as request:
             request_object = request.read()
 
-        # ...
+        # main() structure and flow
+        # Assignee: Eduardo
+        # Issue: #5
+
+        # Skip if empty
+        if not request_object.strip():
+            time.sleep(0.1)
+            continue
+
+        # Validate request
+        validation_result = validate_request(request_object)
+
+        if validation_result:
+            # Get items and filters from request
+            parsed_request = json.loads(request_object)
+            items = parsed_request.get("items", [])
+            filters = parsed_request.get("filters", {})          
+          
+            # Valid: filter items and write success response
+            filtered_items = filter_items(items, filters)
+            response = {
+                "status": "success",
+                "new_items": filtered_items
+            }
+        else:
+            # Invalid: write failure response with original items
+            response = {
+                "status": "failure",
+                "items": items
+            }
+
+        # Write response
+        with open('./output/response.json', 'w', encoding='utf-8') as file:
+            json.dump(response, file, indent=4)
+
+        time.sleep(0.1)
