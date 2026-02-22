@@ -28,8 +28,6 @@ const testItems = [
 
 const exampleFilters = {
     category: "Productivity"
-    // , 
-    // date: "2026-02-20"
 };
 
 
