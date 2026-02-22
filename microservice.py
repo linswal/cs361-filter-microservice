@@ -16,7 +16,7 @@ def filter_items(items, filters):
     return [
         item for item in items
         if ("category" not in filters or
-            items["category"] == filters["category"])
+            item["category"] == filters["category"])
         and ("date" not in filters or item["date"] == filters["date"])
     ]
 
