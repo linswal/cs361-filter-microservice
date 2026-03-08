@@ -30,14 +30,12 @@ def validate_request(request_object):
     returns True for filtering
     returns False for error
     """
-    # load JSON
     try:
         data = json.loads(request_object)
     except json.JSONDecodeError:
         print("JSON request is not valid")
         return False
 
-    # check if filter exists and is a dictionary
     filters = data.get("filters")
     if not filters:
         print("'filters' is missing")
@@ -46,7 +44,6 @@ def validate_request(request_object):
         print("'filters' must be a dictionary")
         return False
 
-    # filter options
     filter_options = ["category", "date"]
 
     for key in filters:
@@ -54,7 +51,6 @@ def validate_request(request_object):
             print(f"Filter not known: '{key}'")
             return False
 
-    # check filters are strings
     if "category" in filters and not isinstance(filters["category"], str):
         print("'category' must be a string")
         return False
@@ -75,12 +71,10 @@ if __name__ == "__main__":
         # Assignee: Eduardo
         # Issue: #5
 
-        # Skip if empty
         if not request_object.strip():
             time.sleep(0.1)
             continue
 
-        # Validate request
         validation_result = validate_request(request_object)
 
         if validation_result:
@@ -102,7 +96,6 @@ if __name__ == "__main__":
                 "items": items
             }
 
-        # Write response
         with open('./output/response.json', 'w', encoding='utf-8') as file:
             json.dump(response, file, indent=4)
 

@@ -1,7 +1,6 @@
 import { readFile, writeFile } from 'fs/promises'
 
 
-// Example array of items to be filtered
 const testItems = [
     {
         name: "Studying",
@@ -56,12 +55,8 @@ async function processResponse() {
 }
 
 async function main() {
-    // Writes request with list of items and filters
     await requestFilterItems(testItems, exampleFilters);
-
-    // Reads response and print results with 300 ms delay
     setTimeout(processResponse, 300);
-
 }
 
 await main();
