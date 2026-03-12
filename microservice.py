@@ -1,8 +1,10 @@
 import json
 import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 
 
-def filter_items(items, filters):
+def filter_items(items: list[dict], filters: dict[str, str]) -> list[dict]:
     """
     Filter items by filters' properties
 
@@ -21,7 +23,7 @@ def filter_items(items, filters):
     ]
 
 
-def validate_request(request_object):
+def validate_request(request_object: str) -> bool:
     """
     Validates JSON request file:
     - reads JSON
@@ -62,41 +64,68 @@ def validate_request(request_object):
     return True
 
 
+def process_request(request_path: str, response_path: str) -> None:
+    """
+    Read request, validates request, and writes response.
+
+    Args:
+        request_path: file path to request.json
+        response_path: file path to response.json
+    """
+    with open(request_path, 'r', encoding='utf-8') as request:
+        request_object = request.read()
+
+    if not request_object.strip():
+        return
+
+    validation_result = validate_request(request_object)
+
+    if validation_result:
+        # Get items and filters from request
+        parsed_request = json.loads(request_object)
+        items = parsed_request.get("items", [])
+        filters = parsed_request.get("filters", {})
+
+        # Valid: filter items and write success response
+        filtered_items = filter_items(items, filters)
+        response = {
+            "status": "success",
+            "new_items": filtered_items
+        }
+    else:
+        # Invalid: write failure response with original items
+        response = {
+            "status": "failure",
+        }
+
+    with open(response_path, 'w', encoding='utf-8') as file:
+        json.dump(response, file, indent=4)
+
+
+class RequestHandler(FileSystemEventHandler):
+    def __init__(self, request_path: str, response_path: str) -> None:
+        self.request_path = request_path
+        self.response_path = response_path
+
+    def on_modified(self, event: FileModifiedEvent) -> None:
+        if event.src_path.endswith('request.json'):
+            process_request(self.request_path, self.response_path)
+
+
 if __name__ == "__main__":
-    while True:
-        with open('./input/request.json', 'r', encoding='utf-8') as request:
-            request_object = request.read()
+    REQUEST_PATH = './input/request.json'
+    RESPONSE_PATH = './output/response.json'
+    WATCH_DIR = './input'
 
-        # main() structure and flow
-        # Assignee: Eduardo
-        # Issue: #5
+    event_handler = RequestHandler(REQUEST_PATH, RESPONSE_PATH)
+    observer = Observer()
+    observer.schedule(event_handler, path=WATCH_DIR, recursive=False)
+    observer.start()
+    print("Watching request.json for changes...")
 
-        if not request_object.strip():
-            time.sleep(0.1)
-            continue
-
-        validation_result = validate_request(request_object)
-
-        if validation_result:
-            # Get items and filters from request
-            parsed_request = json.loads(request_object)
-            items = parsed_request.get("items", [])
-            filters = parsed_request.get("filters", {})
-
-            # Valid: filter items and write success response
-            filtered_items = filter_items(items, filters)
-            response = {
-                "status": "success",
-                "new_items": filtered_items
-            }
-        else:
-            # Invalid: write failure response with original items
-            response = {
-                "status": "failure",
-                "items": items
-            }
-
-        with open('./output/response.json', 'w', encoding='utf-8') as file:
-            json.dump(response, file, indent=4)
-
-        time.sleep(0.1)
+    try:
+        while True:
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
